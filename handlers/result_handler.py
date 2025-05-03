@@ -47,7 +47,7 @@ class ResultsHandler(tornado.web.RequestHandler):
             )
             conn.commit()
         conn.close()
-        self.write(json.dumps({message: "Result added succesfully"}))
+        self.write(json.dumps({"message": "Result added succesfully"}))
 
 class DeleteResultsHandler(tornado.web.RequestHandler):
     def set_default_headers(self):

@@ -117,13 +117,33 @@ class UpdateHandler(tornado.web.RequestHandler):
         finally:
             connection.close()
 
-    
+class DeleteResultsHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "Content-Type, X-Requested-With")
+        self.set_header("Access-Control-Allow-Methods", "DELETE, OPTIONS")
+
+    def options(self, roll_number):
+        self.set_status(204)
+        self.finish()
+
+    def delete(self, roll_number):
+        connection = get_connection()
+        try:
+            with connection.cursor() as cursor:
+                sql = "Delete from results where roll_number = %s"
+                cursor.execute(sql, (roll_number,))
+                connection.commit()
+                self.write({"message": "Result deleted successfully"})
+        finally:
+            connection.close()        
 
 def make_app():
     return tornado.web.Application([
         (r"/results", ResultsHandler),  
         (r"/results/roll/([a-zA-Z0-9]+)", UpdateHandler),  
-        (r"/login", LoginHandler)
+        (r"/login", LoginHandler),
+        (r"/results/delete/([a-zA-Z0-9]+)", DeleteResultsHandler),
     ])
 
 if __name__ == "__main__":
